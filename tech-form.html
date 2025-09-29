@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation Task Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1F2937; /* Dark Blue-Gray */
+            --secondary-color: #4B5563;
+            --accent-color: #3B82F6; /* Blue */
+            --background-color: #F3F4F6; /* Light Gray */
+            --white-color: #FFFFFF;
+            --success-color: #10B981;
+            --pending-color: #F59E0B;
+            --cancelled-color: #EF4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .loader {
+            border: 8px solid var(--background-color);
+            border-top: 8px solid var(--accent-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .task-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--white-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none; /* Initially hidden */
+        }
+
+        .task-header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            text-align: center;
+        }
+        .task-header h1 { font-size: 1.5rem; font-weight: 700; }
+        
+        .task-body { padding: 25px; }
+        .info-group { margin-bottom: 20px; }
+        .info-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 6px;
+        }
+        .info-group .value {
+            font-size: 1.1rem;
+            font-weight: 400;
+            padding: 12px;
+            background-color: #F9FAFB;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .attachment-section { text-align: center; margin-bottom: 20px; }
+        .attachment-section img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px solid #E5E7EB;
+        }
+        
+        #updateForm { margin-top: 25px; }
+
+        #installationStatus {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid #D1D5DB;
+            background-color: var(--white-color);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.8em;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--white-color);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover:not(:disabled) { background-color: #2563EB; }
+        .submit-btn:disabled { background-color: var(--secondary-color); cursor: wait; }
+
+        .message { padding: 20px; text-align: center; font-size: 1.2rem; display: none; }
+        #successMessage { color: var(--success-color); }
+        #errorMessage { color: var(--cancelled-color); }
+    </style>
+</head>
+<body>
+    <div id="loader" class="loader"></div>
+    
+    <div id="taskContainer" class="task-container">
+        <div class="task-header">
+            <h1>Installation Task</h1>
+        </div>
+        <div class="task-body">
+            <div id="attachmentSection" class="attachment-section" style="display: none;">
+                <label>Attachment</label>
+                <img id="techAttachment" src="" alt="Attachment Image">
+            </div>
+            <div class="info-group">
+                <label>Customer Name</label>
+                <div id="newName" class="value"></div>
+            </div>
+            <div class="info-group">
+                <label>Customer Number</label>
+                <div id="newNumber" class="value"></div>
+            </div>
+            <div class="info-group">
+                <label>Service Address</label>
+                <div id="serviceAddress" class="value"></div>
+            </div>
+
+            <form id="updateForm">
+                <div class="info-group">
+                    <label for="installationStatus">Update Installation Status</label>
+                    <select id="installationStatus" name="Installation_Status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Installed">Installed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Update Status</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="successMessage" class="message">Status Updated Successfully!</div>
+    <div id="errorMessage" class="message"></div>
+
+    <script>
+        // --- CONFIGURATION - Yahan apni details daalein ---
+        const AIRTABLE_PAT = 'pat7NcFNg66fUyWbl.b79f56e13480b7b37d257fba01dea131f2716745c259dc069d8959c6d4d9ba62';
+        const BASE_ID = 'appqQZoB8R3qOF2d4';
+        const SALES_TABLE_ID = 'tbleDNOHiRA42L9V1';
+        // --- END CONFIGURATION ---
+
+        const loader = document.getElementById('loader');
+        const taskContainer = document.getElementById('taskContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const updateForm = document.getElementById('updateForm');
+
+        // Step 1: URL se Record ID nikalna
+        const params = new URLSearchParams(window.location.search);
+        const recordId = params.get('id');
+
+        async function fetchJobDetails(id) {
+            if (!id) {
+                showError("Error: No Job ID found in the link.");
+                return;
+            }
+
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${SALES_TABLE_ID}/${id}`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${AIRTABLE_PAT}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Could not fetch job details. Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                populateForm(data.fields);
+                
+                loader.style.display = 'none';
+                taskContainer.style.display = 'block';
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function populateForm(fields) {
+            // Text fields ko populate karein
+            document.getElementById('newName').textContent = fields.New_Name || 'N/A';
+            document.getElementById('newNumber').textContent = fields.New_Number || 'N/A';
+            document.getElementById('serviceAddress').textContent = fields.Service_Address || 'N/A';
+
+            // Status select ko set karein
+            document.getElementById('installationStatus').value = fields.Installation_Status || 'Pending';
+
+            // Attachment (Photo) ko handle karein
+            if (fields.Tech_Attachment && fields.Tech_Attachment.length > 0) {
+                document.getElementById('attachmentSection').style.display = 'block';
+                document.getElementById('techAttachment').src = fields.Tech_Attachment[0].url;
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const submitBtn = event.target.querySelector('.submit-btn');
+            submitBtn.textContent = 'Updating...';
+            submitBtn.disabled = true;
+
+            const newStatus = document.getElementById('installationStatus').value;
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${SALES_TABLE_ID}/${recordId}`;
+
+            const dataToUpdate = {
+                "fields": { "Installation_Status": newStatus }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PATCH', // PATCH method partial updates ke liye best hai
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_PAT}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToUpdate)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update status. Status: ${response.status}`);
+                }
+
+                taskContainer.style.display = 'none';
+                successMessage.style.display = 'block';
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                submitBtn.textContent = 'Update Status';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showError(msg) {
+            loader.style.display = 'none';
+            taskContainer.style.display = 'none';
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+        }
+
+        // --- Script Start ---
+        document.addEventListener('DOMContentLoaded', () => fetchJobDetails(recordId));
+        updateForm.addEventListener('submit', handleFormSubmit);
+
+    </script>
+</body>
+</html>
