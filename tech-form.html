@@ -49,7 +49,7 @@
             width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 500; border-radius: 8px;
             border: 1px solid #D1D5DB; background-color: var(--white-color); -webkit-appearance: none;
             -moz-appearance: none; appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%2...%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.8em; cursor: pointer;
         }
         .submit-btn {
@@ -176,40 +176,40 @@
         }
 
         async function handleFormSubmit(event) {
-    event.preventDefault();
-    const submitBtn = event.target.querySelector('.submit-btn');
-    submitBtn.textContent = 'Updating...';
-    submitBtn.disabled = true;
-
-    const newStatus = document.getElementById('installationStatus').value;
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${SALES_TABLE_ID}/${recordId}`;
-
-    const dataToUpdate = {
-        "fields": { "Installation_Status": newStatus }
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: 'PATCH', // PATCH method partial updates ke liye best hai
-            headers: {
-                'Authorization': `Bearer ${AIRTABLE_PAT}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToUpdate)
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to update status. Status: ${response.status}`);
+            event.preventDefault();
+            const submitBtn = event.target.querySelector('.submit-btn');
+            submitBtn.textContent = 'Updating...';
+            submitBtn.disabled = true;
+            const newStatus = document.getElementById('installationStatus').value;
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${SALES_TABLE_ID}/${recordId}`;
+            const dataToUpdate = { "fields": { "Installation_Status": newStatus } };
+            try {
+                const response = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${AIRTABLE_PAT}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToUpdate)
+                });
+                if (!response.ok) { throw new Error(`Failed to update status. Status: ${response.status}`); }
+                taskContainer.style.display = 'none';
+                successMessage.style.display = 'block';
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                submitBtn.textContent = 'Update Status';
+                submitBtn.disabled = false;
+            }
         }
 
-        taskContainer.style.display = 'none';
-        successMessage.style.display = 'block';
+        function showError(msg) {
+            loader.style.display = 'none';
+            taskContainer.style.display = 'none';
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+        }
 
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        submitBtn.textContent = 'Update Status';
-        submitBtn.disabled = false;
-    }
-}
-
+        // --- Script Start ---
+        document.addEventListener('DOMContentLoaded', () => fetchJobDetails(recordId));
+        document.querySelector('.close-modal').onclick = () => { modal.style.display = "none"; }
+    </script>
+</body>
+</html>
