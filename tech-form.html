@@ -176,3 +176,40 @@
         }
 
         async function handleFormSubmit(event) {
+    event.preventDefault();
+    const submitBtn = event.target.querySelector('.submit-btn');
+    submitBtn.textContent = 'Updating...';
+    submitBtn.disabled = true;
+
+    const newStatus = document.getElementById('installationStatus').value;
+    const url = `https://api.airtable.com/v0/${BASE_ID}/${SALES_TABLE_ID}/${recordId}`;
+
+    const dataToUpdate = {
+        "fields": { "Installation_Status": newStatus }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'PATCH', // PATCH method partial updates ke liye best hai
+            headers: {
+                'Authorization': `Bearer ${AIRTABLE_PAT}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToUpdate)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update status. Status: ${response.status}`);
+        }
+
+        taskContainer.style.display = 'none';
+        successMessage.style.display = 'block';
+
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        submitBtn.textContent = 'Update Status';
+        submitBtn.disabled = false;
+    }
+}
+
